@@ -1,184 +1,159 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <title>SVG Animated Clock</title>
-  <style>
-    body {
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background: #f0f0f0;
-      font-family: Arial, sans-serif;
-    }
-
-    .clock-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .clock {
-      width: 300px;
-      height: 300px;
-    }
-
-    .clock-face {
-      fill: #fff;
-      stroke: #333;
-      stroke-width: 2;
-    }
-
-    .marker {
-      stroke: #333;
-      stroke-width: 2;
-      stroke-linecap: round;
-      transform-origin: 150px 150px;
-    }
-
-    .minute-marker {
-      stroke: #666;
-      stroke-width: 1;
-      transform-origin: 150px 150px;
-    }
-
-    .hand {
-      stroke-linecap: round;
-      transform-origin: 150px 150px;
-    }
-
-    .hour-hand {
-      stroke: #333;
-      stroke-width: 6;
-    }
-
-    .minute-hand {
-      stroke: #666;
-      stroke-width: 4;
-    }
-
-    .second-hand {
-      stroke: #f00;
-      stroke-width: 2;
-    }
-
-    .center-dot {
-      fill: #333;
-    }
-
-    .digital-clock {
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: #333;
-      background: #fff;
-      padding: 10px 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-  </style>
+    <title>SVG Animated Clock</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .clock {
+            width: 300px;
+            height: 300px;
+        }
+        .clock-face {
+            fill: #fff;
+            stroke: #333;
+            stroke-width: 2;
+        }
+        .marker {
+            stroke: #333;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+        .minute-marker {
+            stroke: #666;
+            stroke-width: 1;
+        }
+        .hands {
+            transform-origin: 150px 150px;
+        }
+        .hand {
+            transform-origin: 150px 150px;
+        }
+        .hour-hand {
+            stroke: #333;
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+        .minute-hand {
+            stroke: #666;
+            stroke-width: 4;
+            stroke-linecap: round;
+        }
+        .second-hand {
+            stroke: #f00;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+        .center-dot {
+            fill: #333;
+        }
+        .digital-clock {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            background: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
-
 <body>
-  <div class="clock-container">
-    <svg class="clock" viewBox="0 0 300 300">
-      <!-- Clock face -->
-      <circle class="clock-face" cx="150" cy="150" r="145" />
+    <div class="clock-container">
+        <svg class="clock" viewBox="0 0 300 300">
+            <!-- Clock face -->
+            <circle class="clock-face" cx="150" cy="150" r="145"/>
+            
+            <!-- Markers will be added by JavaScript -->
+            <g class="markers"></g>
 
-      <!-- Markers will be added by JavaScript -->
-      <g class="markers"></g>
+            <!-- Clock hands -->
+            <g class="hands">
+                <line class="hand hour-hand" x1="150" y1="150" x2="150" y2="85"/>
+                <line class="hand minute-hand" x1="150" y1="150" x2="150" y2="65"/>
+                <line class="hand second-hand" x1="150" y1="150" x2="150" y2="55"/>
+            </g>
+            
+            <!-- Center dot -->
+            <circle class="center-dot" cx="150" cy="150" r="3"/>
+        </svg>
+        <div class="digital-clock">00:00:00</div>
+    </div>
 
-      <!-- Clock hands -->
-      <line class="hand hour-hand" x1="150" y1="150" x2="150" y2="80" />
-      <line class="hand minute-hand" x1="150" y1="150" x2="150" y2="60" />
-      <line class="hand second-hand" x1="150" y1="150" x2="150" y2="50" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script>
+        const markers = document.querySelector('.markers');
+        const digitalClock = document.querySelector('.digital-clock');
+        const hourHand = document.querySelector('.hour-hand');
+        const minuteHand = document.querySelector('.minute-hand');
+        const secondHand = document.querySelector('.second-hand');
+        
+        // Create markers
+        for (let i = 0; i < 60; i++) {
+            const marker = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            const isHour = i % 5 === 0;
+            const angle = i * 6;
+            const length = isHour ? 15 : 7;
+            
+            const r1 = isHour ? 135 : 140;
+            const r2 = r1 - length;
+            const x1 = 150 + r1 * Math.cos((angle - 90) * Math.PI / 180);
+            const y1 = 150 + r1 * Math.sin((angle - 90) * Math.PI / 180);
+            const x2 = 150 + r2 * Math.cos((angle - 90) * Math.PI / 180);
+            const y2 = 150 + r2 * Math.sin((angle - 90) * Math.PI / 180);
+            
+            marker.setAttribute("class", isHour ? "marker" : "minute-marker");
+            marker.setAttribute("x1", x1);
+            marker.setAttribute("y1", y1);
+            marker.setAttribute("x2", x2);
+            marker.setAttribute("y2", y2);
+            
+            markers.appendChild(marker);
+        }
 
-      <!-- Center dot -->
-      <circle class="center-dot" cx="150" cy="150" r="3" />
-    </svg>
-    <div class="digital-clock">00:00:00</div>
-  </div>
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script>
-    const markers = document.querySelector('.markers');
-    const digitalClock = document.querySelector('.digital-clock');
+            // Update digital clock
+            const formattedHours = String(hours).padStart(2, '0');
+            const formattedMinutes = String(minutes).padStart(2, '0');
+            const formattedSeconds = String(seconds).padStart(2, '0');
+            digitalClock.textContent = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
 
-    // Create markers
-    for (let i = 0; i < 60; i++) {
-      const marker = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      const isHour = i % 5 === 0;
-      const angle = i * 6; // 360/60 = 6 degrees per marker
-      const length = isHour ? 15 : 7;
+            // Calculate angles
+            const hourAngle = 30 * (hours % 12) + minutes / 2;
+            const minuteAngle = 6 * minutes + seconds / 10;
+            const secondAngle = 6 * seconds;
 
-      // Calculate start and end points using trigonometry
-      const r1 = isHour ? 135 : 140; // Distance from center for start point
-      const r2 = r1 - length; // Distance from center for end point
-      const x1 = 150 + r1 * Math.cos((angle - 90) * Math.PI / 180);
-      const y1 = 150 + r1 * Math.sin((angle - 90) * Math.PI / 180);
-      const x2 = 150 + r2 * Math.cos((angle - 90) * Math.PI / 180);
-      const y2 = 150 + r2 * Math.sin((angle - 90) * Math.PI / 180);
+            // Update hands with SVG transform attribute
+            hourHand.style.transform = `rotate(${hourAngle}deg)`;
+            minuteHand.style.transform = `rotate(${minuteAngle}deg)`;
+            secondHand.style.transform = `rotate(${secondAngle}deg)`;
 
-      marker.setAttribute("class", isHour ? "marker" : "minute-marker");
-      marker.setAttribute("x1", x1);
-      marker.setAttribute("y1", y1);
-      marker.setAttribute("x2", x2);
-      marker.setAttribute("y2", y2);
+            // Schedule next update
+            const msToNextSecond = 1000 - now.getMilliseconds();
+            setTimeout(updateClock, msToNextSecond);
+        }
 
-      markers.appendChild(marker);
-    }
-
-    const hourHand = document.querySelector('.hour-hand');
-    const minuteHand = document.querySelector('.minute-hand');
-    const secondHand = document.querySelector('.second-hand');
-
-    function updateClock() {
-      const now = new Date();
-      const hours = now.getHours() % 12;
-      const minutes = now.getMinutes();
-      const seconds = now.getSeconds();
-
-      // Update digital clock
-      const formattedHours = String(now.getHours()).padStart(2, '0');
-      const formattedMinutes = String(minutes).padStart(2, '0');
-      const formattedSeconds = String(seconds).padStart(2, '0');
-      digitalClock.textContent = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
-
-      // Calculate angles
-      const hourAngle = (hours + minutes / 60) * 30; // 360/12 = 30 degrees per hour
-      const minuteAngle = (minutes + seconds / 60) * 6; // 360/60 = 6 degrees per minute
-      const secondAngle = seconds * 6; // 360/60 = 6 degrees per second
-
-      // Smooth animations for hour and minute hands
-      gsap.to(hourHand, {
-        duration: 0.1,
-        rotation: hourAngle,
-        svgOrigin: "150 150"
-      });
-
-      gsap.to(minuteHand, {
-        duration: 0.1,
-        rotation: minuteAngle,
-        svgOrigin: "150 150"
-      });
-
-      // Instant movement for second hand
-      gsap.set(secondHand, {
-        rotation: secondAngle,
-        svgOrigin: "150 150"
-      });
-
-      // Update exactly on the next second
-      const msToNextSecond = 1000 - now.getMilliseconds();
-      setTimeout(updateClock, msToNextSecond);
-    }
-
-    // Initial positioning
-    updateClock();
-  </script>
+        // Start the clock
+        updateClock();
+    </script>
 </body>
-
 </html>
